@@ -1,0 +1,66 @@
+services:
+  
+  zookeeper:
+    build:
+      context: ./zookeeper
+    image: learning/zookeeper:3.7.0
+    container_name: zookeeper
+    command: ['./bin/zookeeper-server-start.sh', 'config/zookeeper.properties']
+    networks:
+      - kafka_network
+    volumes:
+      - ./data/zookeeper:/zookeeper
+    restart: always
+
+  kafka1:
+    build:
+      context: ./kafka1
+    image: learning/kafka1:3.7.0
+    container_name: kafka1
+    command: ['./bin/kafka-server-start.sh', 'config/server.properties']
+    environment:
+      - JMX_PORT=9595
+    networks:
+      - kafka_network
+    volumes:
+      - ./data/kafka1:/kafka-logs
+    depends_on:
+      - zookeeper
+    restart: always
+  
+  kafka2:
+    build:
+      context: ./kafka2
+    image: learning/kafka2:3.7.0
+    container_name: kafka2
+    command: ['./bin/kafka-server-start.sh', 'config/server.properties']
+    environment:
+      - JMX_PORT=9596
+    networks:
+      - kafka_network
+    volumes:
+      - ./data/kafka2:/kafka-logs
+    depends_on:
+      - zookeeper
+    restart: always
+  
+  kafka3:
+    build:
+      context: ./kafka3
+    image: learning/kafka3:3.7.0
+    container_name: kafka3
+    command: ['./bin/kafka-server-start.sh', 'config/server.properties']
+    environment:
+      - JMX_PORT=9597
+    networks:
+      - kafka_network
+    volumes:
+      - ./data/kafka3:/kafka-logs
+    depends_on:
+      - zookeeper
+    restart: always
+
+networks:
+  kafka_network:
+    name: kafka_network
+    driver: bridge
