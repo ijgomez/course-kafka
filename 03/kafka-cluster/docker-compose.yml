@@ -1,0 +1,43 @@
+services:
+  base-kafka:
+    build:
+      context: ./base-kafka
+    image: learning/base-kafka:1.0.0
+    container_name: kafka-base
+    networks:
+      - kafka_network
+  
+  zookeeper:
+    build:
+      context: ./zookeeper
+    image: learning/zookeeper:3.7.0
+    container_name: zookeeper
+    command: ['./bin/zookeeper-server-start.sh', 'config/zookeeper.properties']
+    networks:
+      - kafka_network
+    volumes:
+      - ./data/zookeeper:/zookeeper
+    depends_on:
+      - base-kafka
+    restart: always
+
+  kafka1:
+    build:
+      context: ./kafka1
+    image: learning/kafka1:3.7.0
+    container_name: kafka1
+    command: ['./bin/kafka-server-start.sh', 'config/server.properties']
+    environment:
+      - JMX_PORT=9595
+    networks:
+      - kafka_network
+    volumes:
+      - ./data/kafka1:/kafka-logs
+    depends_on:
+      - zookeeper
+    restart: always
+
+networks:
+  kafka_network:
+    name: kafka_network
+    driver: bridge
