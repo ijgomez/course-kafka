@@ -1,0 +1,5 @@
+services:
+  base-kafka:
+    build:
+      context: ./base-kafka
+    image: learning/base-kafka:1.0.0
